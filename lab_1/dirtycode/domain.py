@@ -1,9 +1,7 @@
 from enum import Enum
 from exceptions import *
 
-
 class BrowserName(Enum):
-    
     Unknown = 1
     InternetExplorer = 2
     Firefox = 3
@@ -15,106 +13,91 @@ class BrowserName(Enum):
     Linx = 9
 
 
-class Session(object):
-
-    def __init__(self, title, description):
-        '''
-        Constructor
-        '''
-        self._approved = False
-        self._title = title
-        self._description = description
+class Session:
+    def __init__(self, title: str, description: str) -> None:
+        self._approved: bool = False
+        self._title: str = title
+        self._description: str = description
         
-    def getTitle(self):
+    def getTitle(self) -> str:
         return self._title
 
-    def setTitle(self, title):
+    def setTitle(self, title: str) -> None:
         self._title = title
 
-    def getDescription(self):
+    def getDescription(self) -> str:
         return self._description
 
-    def setDescription(self, description):
+    def setDescription(self, description: str) -> None:
         self._description = description
 
-    def isApproved(self):
+    def isApproved(self) -> bool:
         return self._approved
     
-    def setApproved(self, approved):
+    def setApproved(self, approved: bool) -> None:
         self._approved = approved
 
 
-class WebBrowser(object):
-    
-    def __init__(self, name, majorVersion):
-        self._name = self.TranslateStringToBrowserName(name)
-        self._majorVersion = majorVersion
+class WebBrowser:
+    def __init__(self, name: str, majorVersion: int) -> None:
+        self._name: BrowserName = self.TranslateStringToBrowserName(name)
+        self._majorVersion: int = majorVersion
 
-    def TranslateStringToBrowserName(self, name):
+    def TranslateStringToBrowserName(self, name: str) -> BrowserName:
         if "IE" in name:
             return BrowserName.InternetExplorer
         # TODO: Add more logic for properly sniffing for other browsers.
         return BrowserName.Unknown
 
-    def getName(self):
+    def getName(self) -> BrowserName:
         return self._name
 
-    def setName(self, name):
+    def setName(self, name: BrowserName) -> None:
         self._name = name
     
-    def getMajorVersion(self):
+    def getMajorVersion(self) -> int:
         return self._majorVersion
 
-    def setMajorVersion(self, majorVersion):
+    def setMajorVersion(self, majorVersion: int) -> None:
         self._majorVersion = majorVersion
 
 
-class Speaker(object):
+class Speaker:
+    def __init__(self) -> None:
+        self._firstName: str = ""
+        self._lastName: str = ""
+        self._email: str = ""
+        self._exp: int = 0
+        self._hasBlog: bool = False
+        self._blogURL: str = ""
+        self._browser: WebBrowser = None
+        self._certifications: list[str] = []
+        self._employer: str = ""
+        self._registrationFee: int = 0
+        self._sessions: list[Session] = []
 
-    def __init__(self):
-        self._firstName = ""
-        self._lastName = ""
-        self._email = ""
-        self._exp = 0
-        self._hasBlog = False
-        self._blogURL = ""
-        self._browser = None
-        self._certifications = []
-        self._employer = ""
-        self._registrationFee = 0
-        self._sessions = []
-
-    def register(self, repository):
-        speakerId = ""
-        good = False
-        appr = False
-        #nt = [ "Microservices", "Node.js", "CouchDB", "KendoUI", "Dapper", "Angular2" ]
-        ot = ['Cobol', 'Punch Cards', 'Commodore', 'VBScript']
+    def register(self, repository) -> str:
+        speakerId: str = ""
+        good: bool = False
+        appr: bool = False
+        ot: list[str] = ['Cobol', 'Punch Cards', 'Commodore', 'VBScript']
         
-        #DEFECT #5274 DA 12/10/2012
-        #We weren't filtering out the prodigy domain so I added it.
-        domains = ["aol.com", "hotmail.com", "prodigy.com", "compuserve.com"]
+        domains: list[str] = ["aol.com", "hotmail.com", "prodigy.com", "compuserve.com"]
         
-        if (self._firstName):            
-            if (self._lastName):                
-                if (self._email):
-                    #put list of employers in array
-                    emps = ["Pluralsight", "Microsoft", "Google", "Fog Creek Software", "37Signals", "Telerik"]
+        if self._firstName:
+            if self._lastName:                
+                if self._email:
+                    emps: list[str] = ["Pluralsight", "Microsoft", "Google", "Fog Creek Software", "37Signals", "Telerik"]
                     
-                    #DFCT #838 Jimmy
-                    #We're now requiring 3 certifications so I changed the hard coded number. Boy, programming is hard.
-                    good = ((self._exp > 10 or self._hasBlog or len(self._certifications) > 3 or self._employer in emps))                    
-                    if (not good):
-                        #need to get just the domain from the email
-                        splitted = self._email.split("@")
-                        emailDomain = splitted[len(splitted) - 1]
+                    good = (self._exp > 10 or self._hasBlog or len(self._certifications) > 3 or self._employer in emps)                    
+                    if not good:
+                        splitted: list[str] = self._email.split("@")
+                        emailDomain: str = splitted[-1]
 
-                        if (not (emailDomain in domains) and (not(self._browser.getName() == BrowserName.InternetExplorer and self._browser.getMajorVersion() < 9))):
+                        if not (emailDomain in domains) and not (self._browser.getName() == BrowserName.InternetExplorer and self._browser.getMajorVersion() < 9):
                             good = True
-                    if (good):
-                        #DEFECT #5013 CO 1/12/2012
-                        #We weren't requiring at least one session
-                        if (len(self._sessions) != 0):
+                    if good:
+                        if len(self._sessions) != 0:
                             for session in self._sessions:
                                 for tech in ot:
                                     if tech in session.getTitle() or tech in session.getDescription():
@@ -125,37 +108,27 @@ class Speaker(object):
                                         appr = True
                         else:
                             raise ValueError("Can't register speaker with no sessions to present.")                                                
-                        if (appr):
-                            #if we got this far, the speaker is approved
-                            #let's go ahead and register him/her now.
-                            #First, let's calculate the registration fee.
-                            #More experienced speakers pay a lower fee.
-                            if (self._exp <= 1):
-                                self._registrationFee = 500
-                            
-                            elif (self._exp >= 2 and self._exp <= 3):
-                                self._registrationFee = 250
-                            
-                            elif (self._exp >= 4 and self._exp <= 5):
-                                self._registrationFee = 100
-                            
-                            elif (self._exp >= 6 and self._exp <= 9):
-                                self._registrationFee = 50
-                            
+                        if appr:
+                            if self._exp <= 1:
+                                self._registrationFee = 500                            
+                            elif 2 <= self._exp <= 3:
+                                self._registrationFee = 250                            
+                            elif 4 <= self._exp <= 5:
+                                self._registrationFee = 100                            
+                            elif 6 <= self._exp <= 9:
+                                self._registrationFee = 50                            
                             else:
                                 self._registrationFee = 0                                                        
-                            #Now, save the speaker and sessions to the db.
                             try:
                                 speakerId = repository.saveSpeaker(self)
                             except Exception:
-                                #in case the db call fails
                                 print("error") 
                             
                         else:
                             raise NoSessionsApprovedException("No sessions approved.")
                         
                     else:
-                        raise SpeakerDoesntMeetRequirementsException("Speaker doesn't meet our abitrary and capricious standards.")
+                        raise SpeakerDoesntMeetRequirementsException("Speaker doesn't meet our arbitrary and capricious standards.")
                     
                 else:
                     raise ValueError("Email is required.")
@@ -166,35 +139,34 @@ class Speaker(object):
         else:
             raise ValueError("First Name is required")
 
-
         return speakerId
     
-    def setFirstName(self, firstName):
+    def setFirstName(self, firstName: str) -> None:
         self._firstName = firstName
         
-    def setLastName(self, lastName):
+    def setLastName(self, lastName: str) -> None:
         self._lastName = lastName
     
-    def setEmail(self, email):
+    def setEmail(self, email: str) -> None:
         self._email = email
     
-    def setEmployer(self, employer):
+    def setEmployer(self, employer: str) -> None:
         self._employer = employer
     
-    def setHasBlog(self, hasBlog):
+    def setHasBlog(self, hasBlog: bool) -> None:
         self._hasBlog = hasBlog
     
-    def setBrowser(self, webBrowser):
+    def setBrowser(self, webBrowser: WebBrowser) -> None:
         self._browser = webBrowser
     
-    def setExp(self, experience):
-        self._experience = experience
+    def setExp(self, experience: int) -> None:
+        self._exp = experience
     
-    def setCertifications(self, certificates):
+    def setCertifications(self, certificates: list[str]) -> None:
         self._certifications = certificates
     
-    def setBlogURL(self, blogURL):
+    def setBlogURL(self, blogURL: str) -> None:
         self._blogURL = blogURL
         
-    def setSessions(self, sessions):
+    def setSessions(self, sessions: list[Session]) -> None:
         self._sessions = sessions
