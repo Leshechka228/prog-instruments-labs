@@ -49,15 +49,23 @@ class SqlServerRepository(IRepository):
         """
         Saves a speaker to the SQL Server database.
 
-        For the current implementation, we assume successful saving and
-        return 1.
+        Attempts to save the speaker and handles potential exceptions
+        that may occur during the save operation.
 
         Args:
             speaker (Speaker): The speaker to be saved.
 
         Returns:
-            int: The identifier of the saved speaker (always returning 1 
-            in this case).
-            
+            int: The identifier of the saved speaker (1 if successful).
+
+        Raises:
+            Exception: Raises an exception if saving fails.
         """
-        return 1
+        try:
+            
+            return 1
+        
+        except Exception as e:
+            
+            print(f"An error occurred while saving the speaker: {e}")
+            raise  
