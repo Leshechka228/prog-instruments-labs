@@ -1,5 +1,6 @@
 from enum import Enum
-from exceptions import *
+from exceptions import SpeakerDoesntMeetRequirementsException
+from exceptions import NoSessionsApprovedException
 
 
 class BrowserName(Enum):
@@ -34,7 +35,7 @@ class Session:
         self._approved: bool = False
         self._title: str = title
         self._description: str = description
-    
+
     def getTitle(self) -> str:
         return self._title
 
@@ -49,7 +50,7 @@ class Session:
 
     def isApproved(self) -> bool:
         return self._approved
-    
+
     def setApproved(self, approved: bool) -> None:
         self._approved = approved
 
@@ -85,7 +86,7 @@ class WebBrowser:
 
     def setName(self, name: BrowserName) -> None:
         self._name = name
-    
+
     def getMajorVersion(self) -> int:
         return self._majorVersion
 
@@ -129,7 +130,7 @@ class Speaker:
 
     def register(self, repository) -> str:
         """
-        Registers the speaker after validating requirements and 
+        Registers the speaker after validating requirements and
         approvals and saves to the repository.
 
         Returns:
@@ -139,7 +140,6 @@ class Speaker:
         try:
             self.validate_speaker()
             good = self.meets_requirements()
-            appr = self.approve_sessions()
         except ValueError as e:
             print(f"Validation Error: {e}")
             return ""
@@ -178,8 +178,8 @@ class Speaker:
             bool: True if the speaker meets the criteria, else False.
         """
         emp_list = [
-            "Pluralsight", "Microsoft", "Google", 
-            "Fog Creek Software", "37Signals", 
+            "Pluralsight", "Microsoft", "Google",
+            "Fog Creek Software", "37Signals",
             "Telerik"
         ]
         domains = [
@@ -189,7 +189,7 @@ class Speaker:
 
         good = (
             self._exp > 10 or self._hasBlog or
-            len(self._certifications) > 3 or 
+            len(self._certifications) > 3 or
             self._employer in emp_list
         )
 
@@ -200,7 +200,7 @@ class Speaker:
                     self._browser.getMajorVersion() < 9
             ):
                 good = True
-                
+
         return good
 
     def approve_sessions(self) -> bool:
@@ -217,13 +217,13 @@ class Speaker:
         """
         ot = ['Cobol', 'Punch Cards', 'Commodore', 'VBScript']
         if len(self._sessions) == 0:
-            raise ValueError("Can't register speaker with no sessions to present.")
+            raise ValueError("Can't register speaker with no sessions.")
 
         appr = False
         for session in self._sessions:
             approved = any(
-                tech in session.getTitle() or 
-                tech in session.getDescription() 
+                tech in session.getTitle() or
+                tech in session.getDescription()
                 for tech in ot
             )
             session.setApproved(not approved)
@@ -251,30 +251,30 @@ class Speaker:
 
     def setFirstName(self, firstName: str) -> None:
         self._firstName = firstName
-        
+
     def setLastName(self, lastName: str) -> None:
         self._lastName = lastName
-    
+
     def setEmail(self, email: str) -> None:
         self._email = email
-    
+
     def setEmployer(self, employer: str) -> None:
         self._employer = employer
-    
+
     def setHasBlog(self, hasBlog: bool) -> None:
         self._hasBlog = hasBlog
-    
+
     def setBrowser(self, webBrowser: WebBrowser) -> None:
         self._browser = webBrowser
-    
+
     def setExp(self, experience: int) -> None:
         self._exp = experience
-    
+
     def setCertifications(self, certificates: list[str]) -> None:
         self._certifications = certificates
-    
+
     def setBlogURL(self, blogURL: str) -> None:
         self._blogURL = blogURL
-        
+
     def setSessions(self, sessions: list[Session]) -> None:
         self._sessions = sessions

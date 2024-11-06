@@ -1,7 +1,10 @@
 import unittest
 from domain import Speaker, WebBrowser, Session
 from infrastructure import SqlServerRepository
-from exceptions import *
+from exceptions import (
+    NoSessionsApprovedException,
+    SpeakerDoesntMeetRequirementsException,
+)
 
 
 class Test(unittest.TestCase):
@@ -9,7 +12,7 @@ class Test(unittest.TestCase):
     def setUp(self) -> None:
         """
         Sets up the test environment by initializing the repository.
-        
+
         This method runs before each test method to prepare the necessary
         components for the tests.
         """
@@ -18,7 +21,7 @@ class Test(unittest.TestCase):
     def tearDown(self) -> None:
         """
         Cleans up after each test method.
-        
+
         This method runs after each test method, allowing for any necessary
         cleanup tasks.
         """
@@ -27,7 +30,7 @@ class Test(unittest.TestCase):
     def getSpeakerThatWouldBeApproved(self) -> Speaker:
         """
         Creates and returns a Speaker instance that meets approval criteria.
-        
+
         Returns:
             Speaker: An approved speaker with valid attributes.
         """
@@ -45,11 +48,11 @@ class Test(unittest.TestCase):
         speaker.setSessions(sessions)
 
         return speaker
-    
+
     def getSpeakerWithRedFlags(self) -> Speaker:
         """
         Creates a Speaker instance with attributes that raise red flags.
-        
+
         Returns:
             Speaker: A speaker with specified red flag attributes.
         """
@@ -70,7 +73,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("ValueError not raised")
         except ValueError:
-            pass  
+            pass
 
     def test_register_EmptyLastName_RaisesValueError(self) -> None:
         """
@@ -84,7 +87,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("ValueError not raised")
         except ValueError:
-            pass  
+            pass
 
     def test_register_EmptyEmail_RaisesValueError(self) -> None:
         """
@@ -98,7 +101,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("ValueError not raised")
         except ValueError:
-            pass  
+            pass
 
     def test_register_EmpWithRedFlags_ReturnsId(self) -> None:
         """
@@ -148,7 +151,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("NoSessionsApprovedException not raised")
         except NoSessionsApprovedException:
-            pass  
+            pass
 
     def test_register_NoSessions_ThrowsValueError(self) -> None:
         """
@@ -162,7 +165,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("ValueError not raised")
         except ValueError:
-            pass  
+            pass
 
     def test_register_NoBlogOldBrowser_ThrowsException(self) -> None:
         """
@@ -177,7 +180,7 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("SpeakerDoesntMeetRequirementsException not raised")
         except SpeakerDoesntMeetRequirementsException:
-            pass  
+            pass
 
     def test_register_NoBlogOldEmail_ThrowsException(self) -> None:
         """
@@ -192,4 +195,4 @@ class Test(unittest.TestCase):
             speaker.register(self._repository)
             self.fail("SpeakerDoesntMeetRequirementsException not raised")
         except SpeakerDoesntMeetRequirementsException:
-            pass  
+            pass
