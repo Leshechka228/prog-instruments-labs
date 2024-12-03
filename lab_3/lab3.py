@@ -80,8 +80,8 @@ def write_result_to_json(
     :param output_file: Путь к выходному JSON файлу.
     """
     result = {
-        "control_sum": control_sum,
-        "variant_number": variant_number
+        "variant": variant_number,
+        "checksum": control_sum
     }
     with open(output_file, 'w', encoding='utf-8') as json_file:
         json.dump(result, json_file, ensure_ascii=False, indent=4)
