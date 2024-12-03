@@ -41,3 +41,40 @@ def process_csv(file_path):
                 invalid_rows.append(row_number)
 
     return invalid_rows
+
+
+def write_result_to_json(control_sum, variant_number, output_file):
+    result = {
+        "control_sum": control_sum,
+        "variant_number": variant_number
+    }
+    with open(output_file, 'w', encoding='utf-8') as json_file:
+        json.dump(result, json_file)
+
+
+def read_from_json(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as json_file:
+            constants = json.load(json_file)
+            return constants
+    except FileNotFoundError:
+        print(f"Ошибка: Файл '{file_path}' не найден.")
+        return {}
+    except json.JSONDecodeError:
+        print(f"Ошибка: Не удалось декодировать JSON из файла '{file_path}'.")
+        return {}
+
+
+if __name__ == '__main__':
+
+    constants = read_from_json("constants.json")
+    file_path = constants.get("file_path")
+    output_file = constants.get("output_file")
+    variant_number = constants.get("variant_number")
+
+    invalid_rows = process_csv(file_path)
+    control_sum = calculate_checksum(invalid_rows)
+
+    write_result_to_json(control_sum, variant_number, output_file)
+    print(f"Номера невалидных строк: {invalid_rows}")
+    print(f"Контрольная сумма: {control_sum}")
