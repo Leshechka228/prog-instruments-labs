@@ -4,7 +4,8 @@ import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     filename='store.log',
-                    filemode='w')
+                    filemode='w',
+                    encoding='utf-8')
 
 
 class Product:
